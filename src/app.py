@@ -32,6 +32,13 @@ st.divider()
 # 4. User Inputs Section
 st.header("Enter Player Data")
 
+POSITION_TO_SUBPOSITIONS = {
+    "Attack": ["Centre-Forward", "Left Winger", "Right Winger"],
+    "Midfield": ["Central Midfield", "Attacking Midfield", "Defensive Midfield"],
+    "Defender": ["Centre-Back", "Right-Back", "Left-Back"],
+    "Goalkeeper": ["Goalkeeper"],
+}
+
 # We use columns to create a clean grid layout
 col1, col2, col3 = st.columns(3)
 
@@ -40,7 +47,7 @@ with col1:
     age = st.number_input("Age at Valuation", min_value=15.0, max_value=45.0, value=25.0, step=0.1)
     height = st.number_input("Height (cm)", min_value=150.0, max_value=210.0, value=180.0, step=1.0)
     position = st.selectbox("Position", ["Attack", "Midfield", "Defender", "Goalkeeper"])
-    sub_position = st.selectbox("Sub-Position",["Centre-Forward", "Central Midfield", "Centre-Back", "Goalkeeper", "Left Winger", "Right Winger", "Attacking Midfield", "Defensive Midfield", "Right-Back", "Left-Back"])
+    sub_position = st.selectbox("Sub-Position", POSITION_TO_SUBPOSITIONS[position])
     foot = st.selectbox("Foot",["right", "left", "both"])
     citizenship = st.text_input("Country of Citizenship", value="France")
 
@@ -52,20 +59,45 @@ with col2:
     is_major_league = st.selectbox("Is Major National League?", ["True", "False"])
 
 with col3:
-    st.subheader("📈 Recent Form (Last 365 Days)")
-    rec_minutes = st.number_input("Minutes Played (365d)", min_value=0.0, value=2500.0, step=90.0)
-    rec_goals = st.number_input("Goals (365d)", min_value=0.0, value=15.0, step=1.0)
-    rec_assists = st.number_input("Assists (365d)", min_value=0.0, value=5.0, step=1.0)
-    rec_yellow = st.number_input("Yellow Cards (365d)", min_value=0.0, value=3.0, step=1.0)
-    rec_red = st.number_input("Red Cards (365d)", min_value=0.0, value=0.0, step=1.0)
+    st.subheader("🏆 Career Pedigree (Lifetime Stats)")
+    car_minutes = st.number_input("Career Minutes", min_value=0.0, value=15000.0, step=90.0)
+    car_goals = st.number_input("Career Goals", min_value=0.0, value=60.0, step=1.0)
+    car_assists = st.number_input("Career Assists", min_value=0.0, value=25.0, step=1.0)
+    car_yellow = st.number_input("Career Yellows", min_value=0.0, value=15.0, step=1.0)
+    car_red = st.number_input("Career Reds", min_value=0.0, value=1.0, step=1.0)
 
-st.subheader("🏆 Career Pedigree (Lifetime Stats)")
-ccol1, ccol2, ccol3, ccol4, ccol5 = st.columns(5)
-car_minutes = ccol1.number_input("Career Minutes", min_value=0.0, value=15000.0, step=90.0)
-car_goals = ccol2.number_input("Career Goals", min_value=0.0, value=60.0, step=1.0)
-car_assists = ccol3.number_input("Career Assists", min_value=0.0, value=25.0, step=1.0)
-car_yellow = ccol4.number_input("Career Yellows", min_value=0.0, value=15.0, step=1.0)
-car_red = ccol5.number_input("Career Reds", min_value=0.0, value=1.0, step=1.0)
+st.subheader("📈 Recent Form (Last 365 Days)")
+rcol1, rcol2, rcol3, rcol4, rcol5 = st.columns(5)
+rec_minutes = rcol1.number_input(
+    "Minutes Played (365d)",
+    min_value=car_minutes,
+    value=max(2500.0, car_minutes),
+    step=90.0,
+)
+rec_goals = rcol2.number_input(
+    "Goals (365d)",
+    min_value=car_goals,
+    value=max(15.0, car_goals),
+    step=1.0,
+)
+rec_assists = rcol3.number_input(
+    "Assists (365d)",
+    min_value=car_assists,
+    value=max(5.0, car_assists),
+    step=1.0,
+)
+rec_yellow = rcol4.number_input(
+    "Yellow Cards (365d)",
+    min_value=car_yellow,
+    value=max(3.0, car_yellow),
+    step=1.0,
+)
+rec_red = rcol5.number_input(
+    "Red Cards (365d)",
+    min_value=car_red,
+    value=max(0.0, car_red),
+    step=1.0,
+)
 
 st.divider()
 
