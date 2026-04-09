@@ -548,7 +548,7 @@ with col3:
         subtitle="Total minutes played",
         input_label="Career Minutes",
         min_value=0.0,
-        value=15000.0,
+        value=0.0,
         step=90.0,
         key="car_minutes_input",
     )
@@ -558,7 +558,7 @@ with col3:
         subtitle="Goals across all competitions",
         input_label="Career Goals",
         min_value=0.0,
-        value=60.0,
+        value=0.0,
         step=1.0,
         key="car_goals_input",
     )
@@ -568,7 +568,7 @@ with col3:
         subtitle="Direct goal contributions",
         input_label="Career Assists",
         min_value=0.0,
-        value=25.0,
+        value=0.0,
         step=1.0,
         key="car_assists_input",
     )
@@ -578,7 +578,7 @@ with col3:
         subtitle="Disciplinary yellow cards",
         input_label="Career Yellows",
         min_value=0.0,
-        value=15.0,
+        value=0.0,
         step=1.0,
         key="car_yellow_input",
     )
@@ -588,7 +588,7 @@ with col3:
         subtitle="Disciplinary red cards",
         input_label="Career Reds",
         min_value=0.0,
-        value=1.0,
+        value=0.0,
         step=1.0,
         key="car_red_input",
     )
@@ -606,7 +606,7 @@ with rcol1:
         subtitle="Recent time on pitch",
         input_label="Minutes Played (365d)",
         min_value=car_minutes,
-        value=max(2500.0, car_minutes),
+        value=car_minutes,
         step=90.0,
         key="rec_minutes_input",
     )
@@ -617,7 +617,7 @@ with rcol2:
         subtitle="Recent scoring output",
         input_label="Goals (365d)",
         min_value=car_goals,
-        value=max(15.0, car_goals),
+        value=car_goals,
         step=1.0,
         key="rec_goals_input",
     )
@@ -628,7 +628,7 @@ with rcol3:
         subtitle="Recent chance creation",
         input_label="Assists (365d)",
         min_value=car_assists,
-        value=max(5.0, car_assists),
+        value=car_assists,
         step=1.0,
         key="rec_assists_input",
     )
@@ -639,7 +639,7 @@ with rcol4:
         subtitle="Recent discipline profile",
         input_label="Yellow Cards (365d)",
         min_value=car_yellow,
-        value=max(3.0, car_yellow),
+        value=car_yellow,
         step=1.0,
         key="rec_yellow_input",
     )
@@ -650,7 +650,7 @@ with rcol5:
         subtitle="Recent red-card incidents",
         input_label="Red Cards (365d)",
         min_value=car_red,
-        value=max(0.0, car_red),
+        value=car_red,
         step=1.0,
         key="rec_red_input",
     )
