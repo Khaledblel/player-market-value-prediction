@@ -260,6 +260,7 @@ def render_stat_input_card(
     subtitle: str,
     input_label: str,
     min_value: float,
+    max_value: float | None,
     value: float,
     step: float,
     key: str,
@@ -277,14 +278,61 @@ def render_stat_input_card(
         """,
         unsafe_allow_html=True,
     )
+
+    bounded_value = float(st.session_state.get(key, value))
+    if max_value is not None:
+        bounded_value = min(bounded_value, max_value)
+    bounded_value = max(min_value, bounded_value)
+
+    if key in st.session_state and st.session_state[key] != bounded_value:
+        st.session_state[key] = bounded_value
+
+    widget_kwargs = {
+        "min_value": min_value,
+        "value": bounded_value,
+        "step": step,
+        "key": key,
+        "label_visibility": "collapsed",
+    }
+    if max_value is not None:
+        widget_kwargs["max_value"] = max_value
+
     return st.number_input(
         input_label,
-        min_value=min_value,
-        value=value,
-        step=step,
-        key=key,
-        label_visibility="collapsed",
+        **widget_kwargs,
     )
+
+
+def validate_recent_vs_career_stats(
+    *,
+    car_minutes: float,
+    car_goals: float,
+    car_assists: float,
+    car_yellow: float,
+    car_red: float,
+    rec_minutes: float,
+    rec_goals: float,
+    rec_assists: float,
+    rec_yellow: float,
+    rec_red: float,
+) -> list[str]:
+    """Return human-readable validation errors for impossible recent/career combinations."""
+    checks = [
+        ("Minutes", car_minutes, rec_minutes),
+        ("Goals", car_goals, rec_goals),
+        ("Assists", car_assists, rec_assists),
+        ("Yellow cards", car_yellow, rec_yellow),
+        ("Red cards", car_red, rec_red),
+    ]
+
+    errors: list[str] = []
+    for label, career_value, recent_value in checks:
+        if recent_value > career_value:
+            errors.append(
+                f"{label}: Recent Form ({recent_value:,.0f}) cannot exceed Career Pedigree ({career_value:,.0f})."
+            )
+
+    return errors
 
 
 # 1. Page Configuration
@@ -548,6 +596,7 @@ with col3:
         subtitle="Total minutes played",
         input_label="Career Minutes",
         min_value=0.0,
+        max_value=None,
         value=0.0,
         step=90.0,
         key="car_minutes_input",
@@ -558,6 +607,7 @@ with col3:
         subtitle="Goals across all competitions",
         input_label="Career Goals",
         min_value=0.0,
+        max_value=None,
         value=0.0,
         step=1.0,
         key="car_goals_input",
@@ -568,6 +618,7 @@ with col3:
         subtitle="Direct goal contributions",
         input_label="Career Assists",
         min_value=0.0,
+        max_value=None,
         value=0.0,
         step=1.0,
         key="car_assists_input",
@@ -578,6 +629,7 @@ with col3:
         subtitle="Disciplinary yellow cards",
         input_label="Career Yellows",
         min_value=0.0,
+        max_value=None,
         value=0.0,
         step=1.0,
         key="car_yellow_input",
@@ -588,6 +640,7 @@ with col3:
         subtitle="Disciplinary red cards",
         input_label="Career Reds",
         min_value=0.0,
+        max_value=None,
         value=0.0,
         step=1.0,
         key="car_red_input",
@@ -605,7 +658,8 @@ with rcol1:
         icon="🕒",
         subtitle="Recent time on pitch",
         input_label="Minutes Played (365d)",
-        min_value=car_minutes,
+        min_value=0.0,
+        max_value=car_minutes,
         value=car_minutes,
         step=90.0,
         key="rec_minutes_input",
@@ -616,7 +670,8 @@ with rcol2:
         icon="⚽",
         subtitle="Recent scoring output",
         input_label="Goals (365d)",
-        min_value=car_goals,
+        min_value=0.0,
+        max_value=car_goals,
         value=car_goals,
         step=1.0,
         key="rec_goals_input",
@@ -627,7 +682,8 @@ with rcol3:
         icon="🎯",
         subtitle="Recent chance creation",
         input_label="Assists (365d)",
-        min_value=car_assists,
+        min_value=0.0,
+        max_value=car_assists,
         value=car_assists,
         step=1.0,
         key="rec_assists_input",
@@ -638,7 +694,8 @@ with rcol4:
         icon="🟨",
         subtitle="Recent discipline profile",
         input_label="Yellow Cards (365d)",
-        min_value=car_yellow,
+        min_value=0.0,
+        max_value=car_yellow,
         value=car_yellow,
         step=1.0,
         key="rec_yellow_input",
@@ -649,7 +706,8 @@ with rcol5:
         icon="🟥",
         subtitle="Recent red-card incidents",
         input_label="Red Cards (365d)",
-        min_value=car_red,
+        min_value=0.0,
+        max_value=car_red,
         value=car_red,
         step=1.0,
         key="rec_red_input",
@@ -660,6 +718,24 @@ st.divider()
 # 5. Prediction Logic & Button
 # We use a large, primary button to trigger the calculation
 if st.button("🔮 Predict Market Value", use_container_width=True, type="primary"):
+    validation_errors = validate_recent_vs_career_stats(
+        car_minutes=car_minutes,
+        car_goals=car_goals,
+        car_assists=car_assists,
+        car_yellow=car_yellow,
+        car_red=car_red,
+        rec_minutes=rec_minutes,
+        rec_goals=rec_goals,
+        rec_assists=rec_assists,
+        rec_yellow=rec_yellow,
+        rec_red=rec_red,
+    )
+    if validation_errors:
+        st.error("Recent Form values must be less than or equal to Career Pedigree totals.")
+        for error in validation_errors:
+            st.write(f"- {error}")
+        st.stop()
+
     
     # Pack the inputs into a dictionary matching the exact training column names
     input_data = {
