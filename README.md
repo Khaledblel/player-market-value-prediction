@@ -114,6 +114,7 @@ Deployed artifacts:
 |- README.md
 |- LICENSE
 |- .gitignore
+|- Presentation.pptx
 ```
 
 ## Notebook Guide
