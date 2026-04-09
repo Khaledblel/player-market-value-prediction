@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+from pathlib import Path
 
 # 1. Page Configuration
 st.set_page_config(page_title="Player Value Predictor", page_icon="⚽", layout="wide")
@@ -10,8 +11,12 @@ st.set_page_config(page_title="Player Value Predictor", page_icon="⚽", layout=
 # @st.cache_resource ensures the models are only loaded once and cached in memory
 @st.cache_resource
 def load_models():
-    preprocessor = joblib.load("models/preprocessor.joblib")
-    model = joblib.load("models/xgboost_champion.joblib")
+    project_root = Path(__file__).resolve().parents[1]
+    preprocessor_path = project_root / "models" / "preprocessor.joblib"
+    model_path = project_root / "models" / "xgboost_champion.joblib"
+
+    preprocessor = joblib.load(preprocessor_path)
+    model = joblib.load(model_path)
     return preprocessor, model
 
 preprocessor, model = load_models()
